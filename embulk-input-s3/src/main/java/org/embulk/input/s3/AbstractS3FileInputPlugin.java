@@ -72,6 +72,10 @@ public abstract class AbstractS3FileInputPlugin
         public Optional<HttpProxy> getHttpProxy();
         public void setHttpProxy(Optional<HttpProxy> httpProxy);
 
+        @Config("signature_version")
+        @ConfigDefault("null")
+        public Optional<String> getSignatureVersion();
+
         @Config("incremental")
         @ConfigDefault("true")
         public boolean getIncremental();
@@ -148,6 +152,10 @@ public abstract class AbstractS3FileInputPlugin
         clientConfig.setMaxConnections(50); // SDK default: 50
         clientConfig.setMaxErrorRetry(3); // SDK default: 3
         clientConfig.setSocketTimeout(8*60*1000); // SDK default: 50*1000
+
+        if (task.getSignatureVersion().isPresent()) {
+            clientConfig.withSignerOverride(task.getSignatureVersion().get());
+        }
 
         // set http proxy
         if (task.getHttpProxy().isPresent()) {
